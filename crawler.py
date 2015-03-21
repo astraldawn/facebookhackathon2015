@@ -17,9 +17,10 @@ def open_photo(browser, photo_id, self_id):
 
     # Get all the people tagged - DONE
     # person (dict): (id, realname)
-    taggee_list = photo_soup.findAll("a", {"class": "taggee"})
+    taggee_list = photo_soup.findAll("a", {"class": "taggee", "data-tag": True})
     people = {}
     for person in taggee_list:
+        # print person
         person_id = person['data-tag']
         person_name = person.findAll(text=True)
         people[person_id] = ''.join(person_name)
@@ -52,7 +53,11 @@ def extract_photos(browser, first_photo_id, self_id, num_photos):
 
         if not cur_id in vis_photos.keys():
             vis_photos[cur_id] = 1
-            photo_id, post_time, people, next_id = open_photo(browser, cur_id, self_id)
+            try:
+                photo_id, post_time, people, next_id = open_photo(browser, cur_id, self_id)
+            except:
+                print "Crash on", cur_id
+                return result
             result.append([photo_id, post_time, people])
             # print photo_id, post_time, people
             cur_id = next_id
@@ -92,7 +97,7 @@ if __name__ == '__main__':
     browser, photos_of = utility.start_browser(username, password)
     # utility.dump("photos_of", photos_of, "html")
     browser, first_photo_id = utility.get_first_photo(browser, photos_of)
-    # first_photo_id = "1515109561418"
+    # first_photo_id = "918187591526261"
     data = extract_photos(browser, first_photo_id, self_id, 10000)
 
     pickle.dump(data, open(self_id + "_data.p", "wb"))
