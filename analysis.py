@@ -47,7 +47,8 @@ def load_data(data_file):
             tmp_dict[k] = v
         adj_list[u_id] = tmp_dict
         verbose = [(users[k], v) for (k, v) in tmp]
-        # print users[u_id], verbose
+        if u_id == self_id:
+            print users[u_id], verbose
         # print
 
     return adj_list, users
@@ -67,7 +68,7 @@ def build_clique(clique, threshold, starting_threshold, users, adj_list, used):
     used[cur_id] = 1
     friends = sorted(adj_list[cur_id].items(), key=lambda x: -x[1])
 
-    new_threshold = threshold * 0.25
+    new_threshold = threshold * 0.3
     if new_threshold < starting_threshold:
         new_threshold = starting_threshold
     if new_threshold < 3:
@@ -100,7 +101,7 @@ def analyse(self_id, users, adj_list):
 if __name__ == '__main__':
     self_id = "601910818"
     # combine(self_id)
-    adj_list, users = load_data("601910818_combined_data.p")
+    adj_list, users = load_data("mark_data.p")
     g_users = users
     analyse(self_id, users, adj_list)
     # print adj_list
