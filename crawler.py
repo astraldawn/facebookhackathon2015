@@ -48,11 +48,12 @@ def extract_photos(browser, first_photo_id, self_id, num_photos):
     vis_photos = {}
     for i in range(0, num_photos):
         #Terminate the run at this photo
-        if cur_id == "1665949282124":
-            break
+        # if cur_id == "1665949282124":
+        #     break
 
         if not cur_id in vis_photos.keys():
             vis_photos[cur_id] = 1
+            # photo_id, post_time, people, next_id = open_photo(browser, cur_id, self_id)
             try:
                 photo_id, post_time, people, next_id = open_photo(browser, cur_id, self_id)
             except:
@@ -81,6 +82,8 @@ def extract_photos(browser, first_photo_id, self_id, num_photos):
                 cur_id = "1514900678559"
             if cur_id == "1515177083106":
                 cur_id = "481992654572"
+            if cur_id =="10150523117650119":
+                cur_id = "333600256667087"
             rand_delay = random.randint(1, 5)
             print "Waiting", rand_delay
             time.sleep(rand_delay)
@@ -98,6 +101,8 @@ if __name__ == '__main__':
     # utility.dump("photos_of", photos_of, "html")
     browser, first_photo_id = utility.get_first_photo(browser, photos_of)
     # first_photo_id = "918187591526261"
+    # first_photo_id = "10150523117830119"
+    first_photo_id = "345744938390"
     data = extract_photos(browser, first_photo_id, self_id, 10000)
 
     pickle.dump(data, open(self_id + "_data.p", "wb"))
