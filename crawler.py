@@ -38,17 +38,44 @@ def open_photo(browser, photo_id, self_id):
 
     return photo_id, post_time, people, next_id
 
+# Stop at 1515109561418
+
 
 def extract_photos(browser, first_photo_id, self_id, num_photos):
     result = []
     cur_id = first_photo_id
     vis_photos = {}
     for i in range(0, num_photos):
+        #Terminate the run at this photo
+        if cur_id == "1665949282124":
+            break
+
         if not cur_id in vis_photos.keys():
             vis_photos[cur_id] = 1
             photo_id, post_time, people, next_id = open_photo(browser, cur_id, self_id)
             result.append([photo_id, post_time, people])
+            # print photo_id, post_time, people
             cur_id = next_id
+            if cur_id == "10152646351363160":
+                cur_id = "10152646326648160"
+            if cur_id == "10150268535342236":
+                cur_id = "249261681767612"
+            if cur_id == "10150247183549216":
+                cur_id = "10150206609317844"
+            if cur_id == "2065343508667":
+                cur_id = "10150207478188157"
+            if cur_id == "10150221853183048":
+                cur_id = "10150221274734756"
+            if cur_id == "10150188280185819":
+                cur_id = "214625568565272"
+            if cur_id == "212428098784304":
+                cur_id = "10150549882345104"
+            if cur_id == "10150096114610819":
+                cur_id = "1758696642184"
+            if cur_id == "1541229936774":
+                cur_id = "1514900678559"
+            if cur_id == "1515177083106":
+                cur_id = "481992654572"
             rand_delay = random.randint(1, 5)
             print "Waiting", rand_delay
             time.sleep(rand_delay)
@@ -65,6 +92,7 @@ if __name__ == '__main__':
     browser, photos_of = utility.start_browser(username, password)
     # utility.dump("photos_of", photos_of, "html")
     browser, first_photo_id = utility.get_first_photo(browser, photos_of)
+    # first_photo_id = "1515109561418"
     data = extract_photos(browser, first_photo_id, self_id, 10000)
 
     pickle.dump(data, open(self_id + "_data.p", "wb"))
