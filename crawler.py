@@ -2,21 +2,75 @@ import requests
 import mechanize
 from bs4 import BeautifulSoup, Comment
 import utility
+import pickle
+import time
+import random
 
 
-def open_photo(browser, photo_id, cnt):
+def open_photo(browser, photo_id, self_id):
+    print "OPENING PHOTO:", photo_id
     photo_url = "https://www.facebook.com/photo.php?fbid=" + photo_id
+    photo_url += "&set=t." + self_id
     photo_read = browser.open(photo_url).read()
     photo_soup = BeautifulSoup(browser.open(photo_url).read())
-    utility.dump("indiv_photo", photo_read, "html")
+    # utility.dump("indiv_photo", photo_read, "html")
+
+    # Get all the people tagged - DONE
+    # person (dict): (id, realname)
+    taggee_list = photo_soup.findAll("a", {"class": "taggee"})
+    people = {}
+    for person in taggee_list:
+        person_id = person['data-tag']
+        person_name = person.findAll(text=True)
+        people[person_id] = ''.join(person_name)
+    # print people
+
+    # Get time of posting
+    post_list = photo_soup.findAll("abbr", {"data-utime": True})
+    post_time = post_list[0]["data-utime"]
+
+    # Get the next photo
+    next_photo_list = photo_soup.findAll("a", {"class": "photoPageNextNav"})
+    next_url = next_photo_list[0]["href"]
+    next_url = next_url.split("=")
+    next_url = next_url[1].split("&")
+    next_id = next_url[0]
+
+    return photo_id, post_time, people, next_id
+
+
+def extract_photos(browser, first_photo_id, self_id, num_photos):
+    result = []
+    cur_id = first_photo_id
+    vis_photos = {}
+    for i in range(0, num_photos):
+        if not cur_id in vis_photos.keys():
+            vis_photos[cur_id] = 1
+            photo_id, post_time, people, next_id = open_photo(browser, cur_id, self_id)
+            result.append([photo_id, post_time, people])
+            cur_id = next_id
+            rand_delay = random.randint(1, 5)
+            print "Waiting", rand_delay
+            time.sleep(rand_delay)
+        else:
+            break
+
+    return result
+
 
 if __name__ == '__main__':
     username = "prokilerxx@gmail.com"
     password = "facebookhackathontest"
+    self_id = "601910818"
     browser, photos_of = utility.start_browser(username, password)
     # utility.dump("photos_of", photos_of, "html")
     browser, first_photo_id = utility.get_first_photo(browser, photos_of)
-    open_photo(browser, first_photo_id, 0)
+    data = extract_photos(browser, first_photo_id, self_id, 10000)
+
+    pickle.dump(data, open(self_id + "_data.p", "wb"))
+
+    # Load all the data
+    # data_new = pickle.load(open(self_id + "_data.p", "rb"))
 
 # import mechanize  #pip install mechanize</p>
 # mechanize.Browser()
